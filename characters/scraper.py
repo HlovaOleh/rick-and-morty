@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+from django.db import InternalError
 
 from characters.models import Character
 
@@ -30,7 +31,10 @@ def scrape_characters() -> list[Character]:
 
 def save_characters(characters: list[Character]) -> None:
     for character in characters:
-        character.save()
+        try:
+            character.save()
+        except InternalError:
+            print(f"Character with `api_id` : {character.api_id} already exists in db!")
 
 
 def sync_characters_with_api() -> None:
